@@ -13,7 +13,7 @@ from html import unescape
 HOST = "0.0.0.0"
 PORT = 4174
 NDMA_FEED = "https://sachet.ndma.gov.in/cap_public_website/FetchAllAlertDetails"
-USGS_RECENT_EARTHQUAKES = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+RISEQ_EARTHQUAKES = "https://riseq.seismo.gov.in/riseq/earthquake"
 INCOIS_EVENTS = "https://tsunami.incois.gov.in/itews/DSSProducts/OPR/past90days.json"
 ACTIVE_SATELLITES = "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=json"
 
@@ -56,26 +56,28 @@ class AapdaBuddyHandler(SimpleHTTPRequestHandler):
             self.wfile.write(message)
 
     def proxy_ncs_earthquakes(self):
-        """Expose the public USGS recent-earthquake feed as small, structured JSON."""
+        """Expose the National Centre for Seismology RISEQ page as structured JSON."""
         try:
-            request = Request(USGS_RECENT_EARTHQUAKES, headers={"User-Agent": "AapdaBuddy-demo/1.0"})
+            request = Request(RISEQ_EARTHQUAKES, headers={"User-Agent": "AapdaBuddy-demo/1.0"})
             with urlopen(request, timeout=20) as response:
-                feed = json.loads(response.read())
+                page = response.read().decode("utf-8", errors="replace")
             events = []
-            for feature in feed.get("features", []):
-                properties = feature.get("properties") or {}
-                coordinates = (feature.get("geometry") or {}).get("coordinates") or []
-                if properties.get("mag") is None or len(coordinates) < 3:
+            for match in re.finditer(r"data-json='([^']+)'", page):
+                record = json.loads(unescape(match.group(1)))
+                event_name = record.get("event_name", "")
+                name_match = re.match(r"M:\s*([\d.]+)\s*-\s*(.+)", event_name)
+                coordinates = [float(value.strip()) for value in record.get("lat_long", "").split(",")]
+                if not name_match or len(coordinates) != 2:
                     continue
-                event_time = __import__("datetime").datetime.fromtimestamp(properties["time"] / 1000, __import__("datetime").timezone.utc).isoformat().replace("+00:00", "Z")
-                events.append({"origin_time": event_time, "latitude": coordinates[1], "longitude": coordinates[0], "depth_km": coordinates[2], "magnitude": properties["mag"], "location": properties.get("place") or "Unknown location", "detail": properties.get("url"), "source": "USGS Earthquake Hazards Program"})
+                depth_match = re.search(r"D:\s*([\d.]+)", record.get("magnitude_depth", ""))
+                events.append({"origin_time": record.get("origin_time", "Unknown"), "latitude": coordinates[0], "longitude": coordinates[1], "depth_km": float(depth_match.group(1)) if depth_match else None, "magnitude": float(name_match.group(1)), "location": name_match.group(2).strip(), "detail": RISEQ_EARTHQUAKES, "source": "National Centre for Seismology RISEQ"})
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             self.wfile.write(json.dumps(events[:20]).encode())
         except (URLError, HTTPError, TimeoutError, ValueError) as error:
-            message = json.dumps({"error": "USGS public earthquake feed is temporarily unavailable."}).encode()
+            message = json.dumps({"error": "RISEQ earthquake feed is temporarily unavailable."}).encode()
             self.send_response(502)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.end_headers()

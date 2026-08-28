@@ -15,6 +15,8 @@
 
   function applyLanguage(language) {
     document.documentElement.lang = language;
+    document.title = document.title.replace('Aapda Buddy', 'Aapda buddy');
+    const brandName = document.querySelector('.brand b i'); if (brandName) brandName.textContent = 'buddy';
     const hindi = language === 'hi';
     const labels = hindi ? { about: '\u0915\u0947 \u092c\u093e\u0930\u0947 \u092e\u0947\u0902', analytics: '\u0935\u093f\u0936\u094d\u0932\u0947\u0937\u0923', technology: '\u0924\u0915\u0928\u0940\u0915', terms: '\u0928\u093f\u092f\u092e', settings: '\u0938\u0947\u091f\u093f\u0902\u0917\u094d\0938', intelligence: '\u092e\u093f\u0936\u0928 \u0915\u0902\u091f\u094d\0930\u094b\u0932 \u091c\u093e\u0928\u0915\u093e\u0930\u0940', affected: '\u092a\u093f\u091b\u0932\u0947 7 \u0926\u093f\u0928\u094b\u0902 \u092e\u0947\u0902 \u092a\u094d\0930\u092d\u093e\u0935\u093f\u0924 \u0915\u094d\0937\u0947\u0924\u094d\0930 — \u0921\u0947\u092e\u094b' } : { about: 'About', analytics: 'Analytics', technology: 'Technology', terms: 'Terms', settings: 'Settings', intelligence: 'Mission Control Intelligence', affected: 'Detected affected area — demo last 7 days' };
     [['#about', labels.about], ['#analytics', labels.analytics], ['#technology', labels.technology], ['#terms', labels.terms], ['#settings', labels.settings]].forEach(([href, text]) => { const link = document.querySelector(`.links a[href="${href}"]`); if (link) link.textContent = text; });
@@ -22,12 +24,35 @@
     const graph = document.querySelector('#analytics .panel h3'); if (graph) graph.textContent = labels.affected;
   }
 
+  function addSettingsLanguageControl(savedLanguage) {
+    const languageList = document.querySelector('#languageList');
+    if (!languageList || document.querySelector('#appLanguageSelect')) return;
+    const section = languageList.closest('.setting-section');
+    const field = document.createElement('div');
+    field.className = 'setting-field';
+    field.style.marginBottom = '14px';
+    field.innerHTML = '<label for="appLanguageSelect">App language</label><select id="appLanguageSelect"><option value="en">English</option><option value="hi">\u0939\u093f\u0902\u0926\u0940</option></select>';
+    section.insertBefore(field, languageList);
+    const select = field.querySelector('#appLanguageSelect');
+    select.value = savedLanguage || 'en';
+    select.addEventListener('change', () => {
+      const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+      settings.language = select.value;
+      localStorage.setItem(settingsKey, JSON.stringify(settings));
+      applyLanguage(select.value);
+    });
+  }
+
   function init() {
     addStyles();
     const saved = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+    addSettingsLanguageControl(saved.language);
     const sourceState = document.querySelector('#stateSelect');
     const sourceCity = document.querySelector('#citySelect');
     const overlay = document.createElement('div');
+    const details = document.querySelector('#alertDetailContent');
+    if (details) new MutationObserver(() => { const updated = details.innerHTML.replace(/USGS/g, 'RISEQ').replace(/Earthquake Hazards Program/g, 'National Centre for Seismology'); if (updated !== details.innerHTML) details.innerHTML = updated; const link = details.querySelector('.source-link'); if (link) link.textContent = 'VIEW ON RISEQ ↗'; }).observe(details, { childList: true, subtree: true });
+    document.addEventListener('click', event => { if (event.target.closest('[data-quake-index]')) setTimeout(() => { const detail = document.querySelector('#alertDetailContent'); if (!detail) return; detail.innerHTML = detail.innerHTML.replace(/USGS/g, 'RISEQ').replace(/Earthquake Hazards Program/g, 'National Centre for Seismology'); const link = detail.querySelector('.source-link'); if (link) link.textContent = 'VIEW ON RISEQ ↗'; }, 0); });
     overlay.className = 'onboarding';
     overlay.hidden = Boolean(localStorage.getItem(setupKey));
     overlay.setAttribute('role', 'dialog');
