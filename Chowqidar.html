@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1517" />
+  <title>Chowqidar | Your Digital Watchman</title>
+  <style>
+    :root {
+      --ink: #102527;
+      --muted: #5e7374;
+      --line: #d7e1df;
+      --canvas: #f4f7f5;
+      --surface: #ffffff;
+      --teal: #007c75;
+      --teal-dark: #005b57;
+      --mint: #c9f1df;
+      --amber: #e79b22;
+      --coral: #d85443;
+      --danger-bg: #fff0ed;
+      --safe: #237950;
+      --safe-bg: #e7f7ed;
+      --shadow: 0 14px 36px rgba(18, 55, 51, .08);
+    }
+    [data-theme="dark"] {
+      --ink: #e8f0eb;
+      --muted: #9eada5;
+      --line: #293a34;
+      --canvas: #0b0f0e;
+      --surface: #141b18;
+      --teal: #328e76;
+      --teal-dark: #70b89f;
+      --mint: #1d3b32;
+      --danger-bg: #3b2623;
+      --safe-bg: #1c352b;
+      --shadow: 0 14px 36px rgba(0, 0, 0, .22);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--canvas); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { height: 72px; background: var(--surface); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 max(24px, calc((100vw - 1180px) / 2)); }
+    .brand { display: flex; align-items: center; gap: 11px; font-family: Georgia, serif; font-size: 25px; font-weight: 700; letter-spacing: .2px; }
+    .brand-mark { width: 34px; height: 34px; background: var(--teal); border-radius: 50% 50% 45% 45%; display: grid; place-items: center; color: white; font-family: ui-sans-serif, sans-serif; font-size: 18px; box-shadow: inset 0 -5px 0 rgba(0,0,0,.1); }
+    .status { color: var(--safe); font-size: 13px; font-weight: 700; display: flex; gap: 7px; align-items: center; }
+    .status::before { content: ""; height: 8px; width: 8px; background: #42ba77; border-radius: 50%; box-shadow: 0 0 0 4px #ddf5e7; }
+    .hero { background: var(--ink); color: white; overflow: hidden; position: relative; }
+    .hero::after { content: ""; position: absolute; right: -90px; top: -180px; width: 520px; height: 520px; border: 1px solid rgba(201,241,223,.16); border-radius: 50%; box-shadow: 0 0 0 55px rgba(201,241,223,.04), 0 0 0 110px rgba(201,241,223,.025); }
+    .hero-inner { max-width: 1180px; margin: auto; padding: 52px 24px 62px; position: relative; z-index: 1; }
+    .eyebrow { display: inline-flex; gap: 8px; align-items: center; color: var(--mint); font-size: 12px; font-weight: 800; letter-spacing: 1.25px; text-transform: uppercase; }
+    .eyebrow span { width: 20px; border-top: 2px solid var(--mint); }
+    h1 { margin: 13px 0 11px; font-family: Georgia, serif; font-size: clamp(37px, 5vw, 61px); line-height: 1.04; letter-spacing: -.8px; max-width: 650px; }
+    .hero p { max-width: 600px; margin: 0; color: #c6d7d5; font-size: 17px; line-height: 1.6; }
+    main { max-width: 1180px; margin: -24px auto 0; position: relative; z-index: 2; padding: 0 24px 54px; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); gap: 20px; align-items: start; }
+    .checker, .result, .how, .recent, .history { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .checker { padding: 26px; }
+    .card-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 17px; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.1px; }
+    .card-heading p, .section-title p { margin: 5px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+    .mode { display: flex; background: #edf2f0; border-radius: 6px; padding: 3px; }
+    .mode button { border: 0; color: var(--muted); background: transparent; padding: 7px 10px; font-size: 12px; font-weight: 700; border-radius: 4px; }
+    .mode button.active { color: var(--teal-dark); background: white; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+    textarea { resize: vertical; min-height: 187px; width: 100%; padding: 15px; border: 1px solid #b7c8c5; border-radius: 6px; outline: none; color: var(--ink); line-height: 1.5; background: #fbfdfc; }
+    textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,124,117,.12); }
+    textarea::placeholder { color: #869998; }
+    .actions { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin-top: 14px; }
+    .hint { color: var(--muted); font-size: 12px; }
+    .check-btn { border: 0; color: white; background: var(--teal); border-radius: 5px; padding: 11px 17px; font-weight: 800; font-size: 14px; transition: background .2s, transform .2s; }
+    .check-btn:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .examples { border-top: 1px solid var(--line); margin-top: 21px; padding-top: 17px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .examples span { color: var(--muted); font-size: 12px; margin-right: 2px; }
+    .example { background: #eff6f3; color: var(--teal-dark); border: 1px solid #d9e9e3; border-radius: 99px; padding: 6px 10px; font-size: 12px; font-weight: 700; }
+    .example:hover { background: var(--mint); }
+    .side { display: grid; gap: 20px; }
+    .result { min-height: 256px; padding: 25px; }
+    .result.empty { display: grid; place-items: center; text-align: center; color: var(--muted); }
+    .empty-icon { width: 45px; height: 45px; display: grid; place-items: center; font-size: 20px; border-radius: 50%; background: #edf4f1; color: var(--teal); margin: 0 auto 10px; }
+    .empty-title { font-weight: 800; color: var(--ink); font-size: 15px; }
+    .empty-copy { font-size: 13px; line-height: 1.5; margin-top: 5px; max-width: 210px; }
+    .result-content { display: none; }
+    .risk-header { display: flex; justify-content: space-between; align-items: center; }
+    .risk-label { font-size: 12px; color: var(--muted); font-weight: 800; letter-spacing: .75px; text-transform: uppercase; }
+    .risk-value { font-size: 32px; font-family: Georgia, serif; font-weight: bold; }
+    .meter { height: 8px; border-radius: 10px; overflow: hidden; background: #e6ecea; margin: 12px 0 11px; }
+    .meter-fill { height: 100%; width: 0; background: var(--coral); border-radius: inherit; transition: width .6s ease; }
+    .verdict { font-weight: 800; font-size: 16px; margin-bottom: 15px; }
+    .flags { display: grid; gap: 8px; }
+    .flag { padding: 9px 10px; background: var(--danger-bg); color: #874034; border-left: 3px solid var(--coral); font-size: 12px; line-height: 1.35; }
+    .flag.safe { color: #246647; background: var(--safe-bg); border-left-color: #42a96e; }
+    .advice { margin-top: 16px; font-size: 12px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); line-height: 1.5; }
+    .advice strong { color: var(--ink); }
+    .scan-meta { display: flex; align-items: center; justify-content: space-between; gap: 9px; padding: 10px 0 0; font-size: 11px; color: var(--muted); }
+    .scan-meta strong { color: var(--teal-dark); }
+    .how { padding: 21px 25px; }
+    .how h3 { font-size: 14px; margin: 0 0 14px; }
+    .how-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+    .how-item { font-size: 11px; line-height: 1.35; color: var(--muted); }
+    .how-num { color: var(--teal); font-size: 12px; font-weight: 900; display: block; margin-bottom: 3px; }
+    .recent { margin-top: 22px; padding: 24px 26px; }
+    .section-title { display: flex; align-items: end; justify-content: space-between; margin-bottom: 14px; }
+    .recent-list { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+    .recent-item { padding: 15px 17px 5px 0; margin-right: 17px; border-right: 1px solid var(--line); }
+    .recent-item:last-child { border: 0; margin-right: 0; }
+    .pill { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .7px; padding: 4px 7px; border-radius: 3px; background: #fff2d9; color: #99620c; }
+    .pill.safe { background: var(--safe-bg); color: var(--safe); }
+    .recent-item p { margin: 9px 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .history { margin-top: 22px; padding: 23px 26px; }
+    .monthly-stat { margin-top: 22px; padding: 20px 24px; background: var(--teal); color: white; border-radius: 8px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .monthly-stat-copy { display: flex; align-items: center; gap: 13px; }
+    .monthly-stat-icon { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; font-size: 20px; }
+    .monthly-stat-label { display: block; font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--mint); }
+    .monthly-stat p { margin: 4px 0 0; color: #e1f4eb; font-size: 12px; }
+    .monthly-stat strong { font-family: Georgia, serif; font-size: 34px; white-space: nowrap; }
+    .login-screen { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: var(--ink); }
+    .login-screen.hidden { display: none; }
+    .login-card { width: min(430px, 100%); padding: 34px; background: var(--surface); border-radius: 8px; box-shadow: 0 24px 70px rgba(0,0,0,.25); }
+    .login-card .brand { margin-bottom: 32px; }
+    .login-card h1 { margin: 0 0 9px; color: var(--ink); font-family: Georgia, serif; font-size: 34px; }
+    .login-card > p { margin: 0 0 24px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .login-card label { display: block; margin: 14px 0; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .login-card input { display: block; width: 100%; margin-top: 7px; padding: 11px; border: 1px solid #b7c8c5; border-radius: 5px; color: var(--ink); outline: none; }
+    .login-card input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,124,117,.12); }
+    .login-card button { width: 100%; justify-content: center; margin-top: 22px; }
+    .login-note { margin-top: 16px !important; text-align: center; font-size: 11px !important; }
+    .logout-button { border: 0; padding: 0; background: transparent; color: var(--teal); font-size: 11px; font-weight: 800; }
+    .secondary-button { margin-top: 22px; padding: 10px 14px; border: 1px solid var(--teal); border-radius: 5px; background: white; color: var(--teal-dark); font-size: 12px; font-weight: 800; }
+    .secondary-button:hover { background: #edf6f1; }
+    .profile-area { position: relative; display: flex; align-items: center; gap: 14px; }
+    .theme-toggle { width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); font-size: 17px; line-height: 1; }
+    .theme-toggle:hover { border-color: var(--teal); color: var(--teal); }
+    [data-theme="dark"] .mode, [data-theme="dark"] textarea, [data-theme="dark"] .login-card input { background: #101613; }
+    [data-theme="dark"] .mode button.active, [data-theme="dark"] .secondary-button { background: #234238; color: var(--teal-dark); }
+    [data-theme="dark"] .example { background: #1c3b31; border-color: #315a4c; color: var(--teal-dark); }
+    [data-theme="dark"] .empty-icon { background: #1d352d; }
+    [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] .login-card h1 { color: #4e967f !important; }
+    [data-theme="dark"] .hero p { color: #819d91; }
+    [data-theme="dark"] .status { color: #70b89f; }
+    [data-theme="dark"] .status::before { background: #328e76; box-shadow: 0 0 0 4px #1c352b; }
+    [data-theme="dark"] .profile-button { border-color: #315a4c; background: #1d3b31; color: #70b89f; }
+    [data-theme="dark"] .profile-menu { background: #141b18; border-color: #293a34; }
+    [data-theme="dark"] .profile-menu-header { border-color: #293a34; }
+    [data-theme="dark"] .profile-menu-header span { color: #9eada5; }
+    [data-theme="dark"] .menu-item { color: #e8f0eb; }
+    [data-theme="dark"] .menu-item:hover { background: #1c3b31; color: #70b89f; }
+    .profile-button { width: 38px; height: 38px; padding: 0; border: 2px solid #b8ddd0; border-radius: 50%; background: var(--mint); color: var(--teal-dark); font-weight: 900; }
+    .profile-menu { position: absolute; top: 50px; right: 0; z-index: 4; width: 220px; padding: 8px; background: white; border: 1px solid var(--line); border-radius: 7px; box-shadow: var(--shadow); display: none; }
+    .profile-menu.open { display: block; }
+    .profile-menu-header { padding: 10px; border-bottom: 1px solid var(--line); margin-bottom: 5px; }
+    .profile-menu-header strong, .profile-menu-header span { display: block; }
+    .profile-menu-header strong { font-size: 12px; }
+    .profile-menu-header span { color: var(--muted); font-size: 10px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
+    .menu-item { width: 100%; padding: 10px; border: 0; border-radius: 4px; background: transparent; color: var(--ink); text-align: left; font-size: 12px; }
+    .menu-item:hover { background: #edf6f1; color: var(--teal-dark); }
+    .auth-step { display: none; }
+    .auth-step.active { display: block; }
+    .auth-error { min-height: 16px; margin: 9px 0 -4px !important; color: var(--coral) !important; font-size: 11px !important; }
+    .password-wrap { display: flex; align-items: center; gap: 9px; }
+    .password-wrap input { flex: 1; min-width: 0; }
+    .password-toggle { width: auto !important; margin-top: 0 !important; flex: 0 0 auto; border: 0; padding: 3px 0; background: transparent; color: var(--teal); font-size: 17px; line-height: 1; }
+    .password-toggle:hover { color: var(--teal-dark); text-decoration: underline; }
+    .remember-row { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; margin-top: 14px; }
+    .remember-row input { width: auto; margin: 0; }
+    .auth-link { border: 0; background: transparent; color: var(--teal); font-weight: 800; font-size: 11px; padding: 0; }
+    .auth-switch { text-align: center; margin: 20px 0 0 !important; }
+    .loading .button-label { display: none; }
+    .spinner { display: none; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+    .loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .app-modal { position: fixed; inset: 0; z-index: 8; display: none; place-items: center; padding: 20px; background: rgba(16,37,39,.4); }
+    .app-modal.open { display: grid; }
+    .app-modal-card { width: min(560px, 100%); max-height: min(680px, 90vh); overflow: auto; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 24px 70px rgba(0,0,0,.2); }
+    .app-modal-card h2 { font: 700 28px Georgia, serif; margin: 8px 0; }
+    .app-modal-card p, .app-modal-card li { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .app-modal-card ul { padding-left: 20px; }
+    .modal-top { display: flex; justify-content: space-between; align-items: start; }
+    .modal-close { border: 0; background: transparent; color: var(--muted); font-size: 24px; }
+    .profile-detail { display: grid; gap: 9px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .profile-detail div { display: flex; justify-content: space-between; gap: 20px; font-size: 12px; }
+    .profile-detail span { color: var(--muted); }
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 20; max-width: min(360px, calc(100vw - 32px)); padding: 12px 16px; border-radius: 5px; background: var(--teal-dark); color: white; font-size: 12px; box-shadow: 0 8px 24px rgba(16,37,39,.2); transform: translateY(14px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+    .toast.error { background: var(--coral); }
+    .history-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    .history-heading h2 { font-size: 16px; }
+    .clear-history { border: 0; padding: 4px 0; background: transparent; color: var(--teal); font-size: 12px; font-weight: 800; }
+    .clear-history:hover { color: var(--teal-dark); text-decoration: underline; }
+    .history-empty { color: var(--muted); font-size: 12px; padding: 10px 0 2px; }
+    .history-list { display: grid; gap: 0; }
+    .history-row { display: grid; width: 100%; border: 0; background: transparent; text-align: left; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+    .history-score { font-weight: 900; color: var(--coral); font-size: 13px; }
+    .history-score.safe { color: var(--safe); }
+    .history-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); font-size: 12px; }
+    .history-time { color: var(--muted); font-size: 11px; }
+    footer { max-width: 1180px; margin: 0 auto; padding: 0 24px 30px; color: #708482; font-size: 12px; display: flex; justify-content: space-between; gap: 12px; }
+    @media (max-width: 760px) { .topbar { height: 64px; padding: 0 18px; } .status { font-size: 11px; } .hero-inner { padding: 39px 20px 52px; } main { padding: 0 16px 35px; margin-top: -18px; } .workspace { grid-template-columns: 1fr; } .checker { padding: 20px; } .card-heading { display: block; } .mode { display: inline-flex; margin-top: 14px; } .actions { align-items: flex-end; } .hint { max-width: 190px; } .recent { padding: 20px; } .recent-list { grid-template-columns: 1fr; } .recent-item { padding: 14px 0; margin: 0; border-right: 0; border-bottom: 1px solid var(--line); } .recent-item:last-child { border-bottom: 0; } footer { padding: 0 16px 24px; flex-direction: column; } .profile-menu { right: -8px; } .monthly-stat { align-items: flex-start; } .monthly-stat strong { font-size: 28px; } }
+    @media (max-width: 430px) { .login-card { padding: 25px 20px; } .login-card .brand { margin-bottom: 24px; } .login-card h1 { font-size: 29px; } .monthly-stat { padding: 17px; } .monthly-stat-copy { gap: 9px; } .monthly-stat p { font-size: 10px; } .app-modal-card { padding: 24px 20px; } }
+  </style>
+</head>
+<body>
+  <div id="loginScreen" class="login-screen" aria-hidden="true">
+    <form id="loginForm" class="login-card">
+      <div class="brand"><div class="brand-mark">Q</div>Chowqidar</div>
+      <div class="auth-step active" data-step="welcome"><h1>Stay a step ahead.</h1><p>Create your free watch profile to keep your scan history and protection stats on this device.</p><button class="check-btn" id="showSignup" type="button"><span class="button-label">Create an account</span><span class="spinner"></span></button><p class="auth-switch">Already have an account? <button class="auth-link" id="showLogin" type="button">Log in</button></p></div>
+      <div class="auth-step" data-step="signup"><h1>Create your account.</h1><p>Use your name, contact, and a password you choose.</p><label for="signupName">Your name<input id="signupName" autocomplete="name" required placeholder="e.g. Ananya Sharma"></label><label for="signupContact">Email or phone<input id="signupContact" autocomplete="email" required placeholder="you@example.com"></label><label for="signupPassword">Create password<div class="password-wrap"><input id="signupPassword" type="password" minlength="8" required placeholder="At least 8 characters"><button class="password-toggle" type="button" data-target="signupPassword" aria-label="Show password" title="Show password">&#128065;</button></div></label><label for="signupConfirmPassword">Confirm password<div class="password-wrap"><input id="signupConfirmPassword" type="password" required placeholder="Enter it again"><button class="password-toggle" type="button" data-target="signupConfirmPassword" aria-label="Show password" title="Show password">&#128065;</button></div></label><p id="signupError" class="auth-error"></p><button class="check-btn" id="signupSubmit" type="button"><span class="button-label">Create account</span><span class="spinner"></span></button><p class="auth-switch"><button class="auth-link" id="backWelcome" type="button">← Back</button></p></div>
+      <div class="auth-step" data-step="login"><h1>Welcome back.</h1><p>Log in to continue protecting your community.</p><label for="loginContactInput">Email or phone<input id="loginContactInput" autocomplete="email" required placeholder="you@example.com"></label><label for="loginPassword">Password<div class="password-wrap"><input id="loginPassword" type="password" required placeholder="Your password"><button class="password-toggle" type="button" data-target="loginPassword" aria-label="Show password" title="Show password">&#128065;</button></div></label><label class="remember-row"><input id="rememberMe" type="checkbox"> Remember me on this device</label><p id="loginError" class="auth-error"></p><button class="check-btn" id="loginSubmit" type="button"><span class="button-label">Log in</span><span class="spinner"></span></button><p class="auth-switch">New here? <button class="auth-link" id="showSignupFromLogin" type="button">Create an account</button></p></div>
+    </form>
+  </div>
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">Q</div>Chowqidar</div>
+    <div class="profile-area"><div class="status">Protection active</div><button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme">☾</button><button id="profileButton" class="profile-button" aria-label="Open profile menu">Q</button><div id="profileMenu" class="profile-menu"><div class="profile-menu-header"><strong id="menuName">Your profile</strong><span id="menuContact"></span></div><button class="menu-item" data-view="profile" type="button">My Profile</button><button class="menu-item" data-view="tips" type="button">Safety Tips</button><button class="menu-item" data-view="terms" type="button">Terms &amp; Conditions</button></div></div>
+  </header>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow"><span></span> Your Digital Watchman</div>
+      <h1>Pause. Check. Stay protected.</h1>
+      <p>Turn suspicious messages, payment requests and job offers into clear answers before you act.</p>
+    </div>
+  </section>
+  <main>
+    <div class="workspace">
+      <section class="checker">
+        <div class="card-heading">
+          <div><h2>Check something suspicious</h2><p>Paste a message, URL, UPI request, or job posting.</p></div>
+          <div class="mode"><button class="active" type="button">Scan text</button><button type="button">Check link</button></div>
+        </div>
+        <textarea id="input" aria-label="Message to check" placeholder="Example: Dear customer, your KYC has expired. Click bit.ly/update-now to avoid your account being blocked."></textarea>
+        <div class="actions"><div class="hint">Your text is checked privately in your browser.</div><button id="check" class="check-btn" type="button">Check for scams</button></div>
+        <div class="examples"><span>Try an example:</span><button class="example" data-example="upi" type="button">UPI collect request</button><button class="example" data-example="job" type="button">Job offer</button><button class="example" data-example="safe" type="button">Legit message</button></div>
+      </section>
+      <aside class="side">
+        <section id="result" class="result empty">
+          <div class="empty-state"><div class="empty-icon">⌁</div><div class="empty-title">Your scan result will appear here</div><div class="empty-copy">We explain the signals behind every risk score.</div></div>
+          <div class="result-content">
+            <div class="risk-header"><div class="risk-label">Risk score</div><div id="score" class="risk-value">0/100</div></div>
+            <div class="meter"><div id="meter" class="meter-fill"></div></div>
+            <div id="verdict" class="verdict"></div><div id="flags" class="flags"></div>
+            <div id="advice" class="advice"></div>
+            <div class="scan-meta"><span id="scan-type">Text scan</span><strong id="confidence">Confidence: --</strong></div>
+          </div>
+        </section>
+        <section class="how"><h3>How Chowqidar checks</h3><div class="how-list"><div class="how-item"><span class="how-num">01</span>Urgency and pressure</div><div class="how-item"><span class="how-num">02</span>Links and payment cues</div><div class="how-item"><span class="how-num">03</span>Job scam patterns</div></div></section>
+      </aside>
+    </div>
+    <section class="monthly-stat"><div class="monthly-stat-copy"><span class="monthly-stat-icon">✓</span><div><span class="monthly-stat-label">Scams stopped this month</span><p>Messages flagged by your Chowqidar protection checks</p></div></div><strong id="monthlyCount">0</strong></section>
+    <section class="recent"><div class="section-title"><div><h2>What Chowqidar looks for</h2><p>Small signals can reveal a larger scam pattern.</p></div></div><div class="recent-list"><div class="recent-item"><span class="pill">UPI safety</span><p>Requests to approve a collect payment to “receive” money.</p></div><div class="recent-item"><span class="pill">Phishing</span><p>Urgent action paired with shortened or lookalike links.</p></div><div class="recent-item"><span class="pill safe">Job safety</span><p>Upfront fees and vague, WhatsApp-only recruitment.</p></div></div></section>
+  </main>
+    <section class="history"><div class="history-heading"><h2>Recent checks</h2><button id="clear-history" class="clear-history" type="button">Clear history</button></div><div id="history-list" class="history-list"></div><div id="history-empty" class="history-empty">No scans yet. Your latest checks will stay on this device.</div></section>
+  <footer><span>Chowqidar checks common fraud patterns. It does not replace your bank or cybercrime authorities.</span><span>Never share OTPs, PINs or passwords.</span></footer>
+  <div id="appModal" class="app-modal" aria-hidden="true"><section class="app-modal-card"><div class="modal-top"><div><p class="eyebrow" id="modalEyebrow">ACCOUNT</p><h2 id="modalTitle">My Profile</h2></div><button class="modal-close" id="closeAppModal" aria-label="Close">×</button></div><div id="modalContent"></div></section></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+    const examples = {
+      upi: "Congratulations! You have won a cashback of Rs 2,000. Open the UPI collect request and enter your PIN to receive it now. Valid for 10 minutes.",
+      job: "Urgent hiring for work from home. Earn Rs 45,000 weekly. No interview needed. Pay Rs 499 registration fee today and WhatsApp your Aadhaar to 9876543210.",
+      safe: "Hi Ananya, your order #CK-1942 has been delivered. For help, visit the Help section in the official Chowqidar app. Thank you."
+    };
+    const input = document.querySelector('#input');
+    const check = document.querySelector('#check');
+    const result = document.querySelector('#result');
+    const scoreEl = document.querySelector('#score');
+    const meter = document.querySelector('#meter');
+    const verdict = document.querySelector('#verdict');
+    const flags = document.querySelector('#flags');
+    const advice = document.querySelector('#advice');
+    const scanType = document.querySelector('#scan-type');
+    const confidence = document.querySelector('#confidence');
+    const historyList = document.querySelector('#history-list');
+    const historyEmpty = document.querySelector('#history-empty');
+    const loginScreen = document.querySelector('#loginScreen');
+    const loginForm = document.querySelector('#loginForm');
+    const monthlyCount = document.querySelector('#monthlyCount');
+    const historyKey = 'chowqidar-scan-history';
+    const scamEventsKey = 'chowqidar-scam-events';
+    const profileKey = 'chowqidar-profile';
+    let activeMode = 'text';
+    function escapeHtml(value) {
+      return value.replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+    }
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem(historyKey)) || []; } catch { return []; }
+    }
+    function getScamEvents() {
+      try { return JSON.parse(localStorage.getItem(scamEventsKey)) || []; } catch { return []; }
+    }
+    function updateMonthlyCount() {
+      const now = new Date();
+      const count = getScamEvents().filter(event => { const date = new Date(event.timestamp); return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth(); }).length;
+      monthlyCount.textContent = count.toLocaleString();
+    }
+    function recordScamEvent() {
+      const events = [...getScamEvents(), { timestamp: new Date().toISOString() }];
+      localStorage.setItem(scamEventsKey, JSON.stringify(events));
+      updateMonthlyCount();
+    }
+    function renderHistory() {
+      const items = getHistory();
+      historyList.innerHTML = items.map(item => '<button class="history-row" type="button" data-text="' + encodeURIComponent(item.text) + '"><span class="history-score ' + (item.score < 25 ? 'safe' : '') + '">' + item.score + '</span><span class="history-text">' + escapeHtml(item.text) + '</span><span class="history-time">' + item.time + '</span></button>').join('');
+      historyEmpty.style.display = items.length ? 'none' : 'block';
+      historyList.querySelectorAll('.history-row').forEach(row => row.addEventListener('click', () => { input.value = decodeURIComponent(row.dataset.text); scan(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+    }
+    function saveHistory(text, score) {
+      const shortText = text.slice(0, 180);
+      const next = [{ text: shortText, score, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }, ...getHistory().filter(item => item.text !== shortText)].slice(0, 5);
+      localStorage.setItem(historyKey, JSON.stringify(next)); renderHistory();
+    }
+    function inspectUrl(text, add) {
+      const match = text.match(/(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/[^\s]*)?/i);
+      if (!match) return;
+      const raw = match[0];
+      try {
+        const url = new URL(raw.startsWith('http') ? raw : 'https://' + raw);
+        const host = url.hostname.toLowerCase();
+        add(host.includes('xn--'), 24, 'This link uses an encoded domain name, which can disguise lookalike characters.');
+        add(host.split('.').length > 3, 12, 'This link has multiple subdomains. Check the registered domain carefully.');
+        add(/(login|verify|kyc|secure|update|claim|reward)/.test(url.pathname + url.search), 12, 'The link contains a high-pressure account or reward action path.');
+        add(!raw.startsWith('https://'), 8, 'This link was not presented as a secure HTTPS address.');
+      } catch { add(true, 10, 'The link format looks unusual or incomplete.'); }
+    }
+    function scan() {
+      const text = input.value.trim();
+      if (!text) { input.focus(); return; }
+      const lower = text.toLowerCase(); let score = 0; const found = [];
+      const add = (condition, points, message) => { if (condition) { score += points; found.push(message); } };
+      if (activeMode !== 'link') add(/upi|collect request|payment request|scan.*qr|qr.*scan/.test(lower), 25, 'UPI payment language found. A collect request sends money; it does not receive it.');
+      if (activeMode !== 'link') add(/pin|otp|cvv|password|aadhaar/.test(lower), 24, 'Sensitive information is being requested. A legitimate service will not ask for your PIN or OTP.');
+      if (activeMode !== 'link') add(/urgent|immediately|today|now|minutes|expire|blocked|last chance/.test(lower), 16, 'Urgency language can pressure you into acting before you verify.');
+      add(/bit\.ly|tinyurl|t\.co|\.xyz|\.top|\.click|arnaz0n|g00gle/.test(lower), 25, 'A shortened or lookalike link is present. Verify the official domain independently.');
+      inspectUrl(text, add);
+      if (activeMode !== 'link') add(/registration fee|processing fee|security deposit|pay.*fee|fees? .*job/.test(lower), 26, 'Upfront payment is a common fake-job signal. Legitimate employers do not charge to hire you.');
+      if (activeMode !== 'link') add(/work from home|no interview|whatsapp|weekly|daily income/.test(lower), 14, 'This matches common high-pay, low-detail recruitment language.');
+      if (activeMode !== 'link') add(/cashback|refund|prize|won|lucky/.test(lower), 15, 'An unexpected reward or refund claim needs independent verification.');
+      if (found.length === 0) { score = /order|delivered|thank you|official app/.test(lower) ? 8 : 18; found.push('No high-confidence scam indicators were found in this text.'); }
+      score = Math.min(score, 100);
+      result.classList.remove('empty');
+      document.querySelector('.empty-state').style.display = 'none';
+      document.querySelector('.result-content').style.display = 'block';
+      scoreEl.textContent = score + '/100'; meter.style.width = score + '%';
+      const high = score >= 55, medium = score >= 25;
+      if (high) recordScamEvent();
+      meter.style.background = high ? 'var(--coral)' : medium ? 'var(--amber)' : 'var(--safe)';
+      verdict.textContent = high ? 'High risk — do not engage yet.' : medium ? 'Caution advised — verify independently.' : 'Looks low risk.';
+      verdict.style.color = high ? 'var(--coral)' : medium ? '#b57412' : 'var(--safe)';
+      flags.innerHTML = found.map(item => '<div class="flag ' + (!high && !medium ? 'safe' : '') + '">' + item + '</div>').join('');
+      advice.innerHTML = high ? '<strong>What to do:</strong> Do not click links, scan QR codes, approve requests, or share credentials. Contact the organisation using its official app or website.' : '<strong>What to do:</strong> Still verify unexpected messages through the sender’s official contact channel.';
+      scanType.textContent = activeMode === 'link' ? 'Link scan' : 'Text scan';
+      confidence.textContent = 'Confidence: ' + (found.length >= 3 ? 'high' : found.length >= 1 ? 'moderate' : 'low');
+      saveHistory(text, score);
+    }
+    check.addEventListener('click', scan);
+    input.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') scan(); });
+    document.querySelectorAll('.example').forEach(btn => btn.addEventListener('click', () => { input.value = examples[btn.dataset.example]; scan(); }));
+    document.querySelectorAll('.mode button').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.mode button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); activeMode = btn.textContent === 'Check link' ? 'link' : 'text'; input.placeholder = activeMode === 'link' ? 'Paste a website address, e.g. https://arnaz0n.in/verify' : 'Paste a suspicious message, payment request, job posting, or link...'; }));
+    document.querySelector('#clear-history').addEventListener('click', () => { localStorage.removeItem(historyKey); renderHistory(); });
+    const accountKey = 'chowqidar-account';
+    const sessionKey = 'chowqidar-session';
+    const profileButton = document.querySelector('#profileButton');
+    const profileMenu = document.querySelector('#profileMenu');
+    const appModal = document.querySelector('#appModal');
+    const modalTitle = document.querySelector('#modalTitle');
+    const modalContent = document.querySelector('#modalContent');
+    const toast = document.querySelector('#toast');
+    const themeToggle = document.querySelector('#themeToggle');
+    const themeKey = 'chowqidar-theme';
+    const getAccount = () => { try { return JSON.parse(localStorage.getItem(accountKey)); } catch { return null; } };
+    const getSession = () => { try { return JSON.parse(sessionStorage.getItem(sessionKey) || localStorage.getItem(sessionKey)); } catch { return null; } };
+    function showToast(message, isError = false) { toast.textContent = message; toast.className = 'toast visible' + (isError ? ' error' : ''); setTimeout(() => { toast.className = 'toast'; }, 2800); }
+    function setTheme(theme) { const isDark = theme === 'dark'; document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; themeToggle.textContent = isDark ? '☀' : '☾'; themeToggle.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme'); themeToggle.title = isDark ? 'Switch to light theme' : 'Switch to dark theme'; localStorage.setItem(themeKey, isDark ? 'dark' : 'light'); }
+    function setAuthStep(step) { document.querySelectorAll('.auth-step').forEach(item => item.classList.toggle('active', item.dataset.step === step)); const activeStep = loginForm.querySelector('.auth-step.active'); loginForm.querySelectorAll('input').forEach(item => { item.disabled = !activeStep || !activeStep.contains(item); }); }
+    function setBusy(button, busy) { button.classList.toggle('loading', busy); button.disabled = busy; }
+    function finishSession(remember) { const session = { startedAt: Date.now() }; (remember ? localStorage : sessionStorage).setItem(sessionKey, JSON.stringify(session)); loginScreen.classList.add('hidden'); loginScreen.setAttribute('aria-hidden', 'true'); updateProfileMenu(); }
+    function updateProfileMenu() { const account = getAccount(); if (!account) return; document.querySelector('#menuName').textContent = account.name; document.querySelector('#menuContact').textContent = account.contact; profileButton.textContent = (account.name || 'Q').slice(0, 1).toUpperCase(); }
+    function logout() { localStorage.removeItem(sessionKey); sessionStorage.removeItem(sessionKey); profileMenu.classList.remove('open'); appModal.classList.remove('open'); appModal.setAttribute('aria-hidden', 'true'); loginScreen.classList.remove('hidden'); loginScreen.setAttribute('aria-hidden', 'false'); setAuthStep('login'); showToast('You have been logged out.'); }
+    function openModal(view) { const account = getAccount(); profileMenu.classList.remove('open'); appModal.classList.add('open'); appModal.setAttribute('aria-hidden', 'false'); if (view === 'profile') { modalTitle.textContent = 'My Profile'; const total = getHistory().length; modalContent.innerHTML = '<p>Your personal safety dashboard.</p><div class="profile-detail"><div><span>Name</span><strong>' + escapeHtml(account.name) + '</strong></div><div><span>Email / phone</span><strong>' + escapeHtml(account.contact) + '</strong></div><div><span>Member since</span><strong>' + new Date(account.createdAt).toLocaleDateString() + '</strong></div><div><span>Total checks</span><strong>' + total + '</strong></div></div><button id="profileLogout" class="secondary-button" type="button">Log out</button>'; document.querySelector('#profileLogout').addEventListener('click', logout); } else if (view === 'tips') { modalTitle.textContent = 'Safety Tips'; modalContent.innerHTML = '<p>Keep these habits close when a message feels urgent or unexpected.</p><ul><li>Never share your OTP, PIN, CVV, or password.</li><li>Verify UPI requests before approving them. You never enter a PIN to receive money.</li><li>Government agencies and banks never ask for money through SMS.</li><li>Open official apps directly instead of tapping links in messages.</li><li>Pause and contact a trusted person before sending money.</li></ul>'; } else { modalTitle.textContent = 'Terms & Conditions'; modalContent.innerHTML = '<p>Chowqidar provides pattern-based scam awareness for informational purposes. Results are not a guarantee that a message is safe or fraudulent. You remain responsible for verifying senders, links, payments, and requests independently.</p><p>Do not use Chowqidar as a replacement for your bank, local authorities, or a cybercrime reporting service. We store demo account details, scan history, and safety events locally in your browser.</p>'; } }
+    document.querySelector('#showSignup').addEventListener('click', () => setAuthStep('signup'));
+    document.querySelector('#showLogin').addEventListener('click', () => setAuthStep('login'));
+    document.querySelector('#showSignupFromLogin').addEventListener('click', () => setAuthStep('signup'));
+    document.querySelector('#backWelcome').addEventListener('click', () => setAuthStep('welcome'));
+    document.querySelector('#signupSubmit').addEventListener('click', () => { const name = document.querySelector('#signupName').value.trim(); const contact = document.querySelector('#signupContact').value.trim(); const password = document.querySelector('#signupPassword').value; const confirmation = document.querySelector('#signupConfirmPassword').value; const error = document.querySelector('#signupError'); if (!name || !contact) { error.textContent = 'Enter your name and email or phone.'; return; } if (password.length < 8) { error.textContent = 'Password must be at least 8 characters.'; return; } if (password !== confirmation) { error.textContent = 'Passwords do not match.'; return; } error.textContent = ''; const button = document.querySelector('#signupSubmit'); setBusy(button, true); setTimeout(() => { localStorage.setItem(accountKey, JSON.stringify({ name, contact, password, createdAt: Date.now() })); setBusy(button, false); finishSession(true); showToast('Account created successfully.'); }, 550); });
+    document.querySelector('#loginSubmit').addEventListener('click', () => { const account = getAccount(); const contact = document.querySelector('#loginContactInput').value.trim(); const password = document.querySelector('#loginPassword').value; const error = document.querySelector('#loginError'); if (!account || contact !== account.contact || password !== account.password) { error.textContent = 'Incorrect email/phone or password.'; showToast('Login details could not be verified.', true); return; } error.textContent = ''; const button = document.querySelector('#loginSubmit'); setBusy(button, true); setTimeout(() => { setBusy(button, false); finishSession(document.querySelector('#rememberMe').checked); showToast('Login successful.'); }, 550); });
+    themeToggle.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+    document.querySelectorAll('.password-toggle').forEach(button => button.addEventListener('click', () => { const field = document.querySelector('#' + button.dataset.target); field.type = field.type === 'password' ? 'text' : 'password'; button.setAttribute('aria-label', field.type === 'password' ? 'Show password' : 'Hide password'); }));
+    profileButton.addEventListener('click', () => profileMenu.classList.toggle('open'));
+    document.addEventListener('click', event => { if (!event.target.closest('.profile-area')) profileMenu.classList.remove('open'); });
+    document.querySelectorAll('.menu-item[data-view]').forEach(button => button.addEventListener('click', () => openModal(button.dataset.view)));
+    document.querySelector('#closeAppModal').addEventListener('click', () => { appModal.classList.remove('open'); appModal.setAttribute('aria-hidden', 'true'); });
+    appModal.addEventListener('click', event => { if (event.target === appModal) { appModal.classList.remove('open'); appModal.setAttribute('aria-hidden', 'true'); } });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { profileMenu.classList.remove('open'); appModal.classList.remove('open'); appModal.setAttribute('aria-hidden', 'true'); } });
+    setTheme(localStorage.getItem(themeKey) === 'dark' ? 'dark' : 'light');
+    renderHistory();
+    updateMonthlyCount();
+    if (getSession() && getAccount()) {
+      loginScreen.classList.add('hidden');
+      updateProfileMenu();
+    } else if (getAccount()) {
+      setAuthStep('login');
+    } else {
+      loginScreen.setAttribute('aria-hidden', 'false');
+      setAuthStep('welcome');
+    }
+  </script>
+</body>
+</html>

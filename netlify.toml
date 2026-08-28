@@ -1,0 +1,18 @@
+[build]
+  publish = "AstraWatch-Website"
+  functions = "AstraWatch-Website/netlify/functions"
+
+[[redirects]]
+  from = "/api/ndma-alerts"
+  to = "/.netlify/functions/ndma-alerts"
+  status = 200
+
+[[redirects]]
+  from = "/api/ncs-earthquakes"
+  to = "/.netlify/functions/ncs-earthquakes"
+  status = 200
+
+[[redirects]]
+  from = "/api/incois-events"
+  to = "/.netlify/functions/incois-events"
+  status = 200
