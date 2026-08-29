@@ -16,7 +16,7 @@
   function applyLanguage(language) {
     document.documentElement.lang = language;
     document.title = document.title.replace('Aapda Buddy', 'Aapda buddy');
-    const brandName = document.querySelector('.brand b i'); if (brandName) brandName.textContent = 'buddy';
+    const brandName = document.querySelector('.brand b i'); if (brandName) brandName.textContent = 'Buddy';
     const hindi = language === 'hi';
     const labels = hindi ? { about: '\u0915\u0947 \u092c\u093e\u0930\u0947 \u092e\u0947\u0902', analytics: '\u0935\u093f\u0936\u094d\u0932\u0947\u0937\u0923', technology: '\u0924\u0915\u0928\u0940\u0915', terms: '\u0928\u093f\u092f\u092e', settings: '\u0938\u0947\u091f\u093f\u0902\u0917\u094d\0938', intelligence: '\u092e\u093f\u0936\u0928 \u0915\u0902\u091f\u094d\0930\u094b\u0932 \u091c\u093e\u0928\u0915\u093e\u0930\u0940', affected: '\u092a\u093f\u091b\u0932\u0947 7 \u0926\u093f\u0928\u094b\u0902 \u092e\u0947\u0902 \u092a\u094d\0930\u092d\u093e\u0935\u093f\u0924 \u0915\u094d\0937\u0947\u0924\u094d\0930 — \u0921\u0947\u092e\u094b' } : { about: 'About', analytics: 'Analytics', technology: 'Technology', terms: 'Terms', settings: 'Settings', intelligence: 'Mission Control Intelligence', affected: 'Detected affected area — demo last 7 days' };
     [['#about', labels.about], ['#analytics', labels.analytics], ['#technology', labels.technology], ['#terms', labels.terms], ['#settings', labels.settings]].forEach(([href, text]) => { const link = document.querySelector(`.links a[href="${href}"]`); if (link) link.textContent = text; });
@@ -74,6 +74,9 @@
     updateCopy();
     overlay.querySelector('.onboarding-submit').addEventListener('click', () => { if (!state.value || !city.value) { state.focus(); return; } localStorage.setItem(settingsKey, JSON.stringify({ state: state.value, city: city.value, language: language.value })); localStorage.setItem(setupKey, 'complete'); applyLanguage(language.value); overlay.hidden = true; });
     applyLanguage(saved.language || 'en');
+    setTimeout(() => { const brandName = document.querySelector('.brand b i'); if (brandName) brandName.textContent = 'Buddy'; }, 0);
+    const brand = document.querySelector('.brand b');
+    if (brand) new MutationObserver(() => { const brandName = brand.querySelector('i'); if (brandName && brandName.textContent !== 'Buddy') brandName.textContent = 'Buddy'; }).observe(brand, { childList: true, subtree: true, characterData: true });
   }
 
   init();

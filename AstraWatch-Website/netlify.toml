@@ -21,3 +21,13 @@
   from = "/api/dashboard-metrics"
   to = "/.netlify/functions/dashboard-metrics"
   status = 200
+
+[[redirects]]
+  from = "/api/past-disasters"
+  to = "/.netlify/functions/past-disasters"
+  status = 200
+
+[[redirects]]
+  from = "/api/ai"
+  to = "/.netlify/functions/ai"
+  status = 200

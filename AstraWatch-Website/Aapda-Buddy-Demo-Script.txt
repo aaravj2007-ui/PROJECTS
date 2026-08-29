@@ -1,0 +1,12 @@
+Aapda Buddy demo narration
+
+1. “First, I enter my name and complete address so the Help & Safety tools know who needs assistance.”
+2. “I select live location access and allow the browser permission.”
+3. “Mission Control now combines official NDMA, National Centre for Seismology, INCOIS and USGS feeds.”
+4. “The map and alert cards show current events, source details and severity.”
+5. “I can ask Aapda AI a safety question by typing, pressing the search icon, or using Voice Command.”
+6. “My spoken words are automatically written into the question box before the answer is requested.”
+7. “Global History lets me search past earthquakes by location, year or magnitude.”
+8. “In Help & Safety, my name and address are already filled into the SOS and safety check-in tools.”
+9. “I can use GPS to update my location, send an SOS, or call 112 for immediate emergency help.”
+10. “Finally, I verify every warning with the official agency before taking action.”
