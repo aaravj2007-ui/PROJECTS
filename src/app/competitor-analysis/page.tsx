@@ -1,0 +1,5 @@
+import { RankForgeSection } from "@/components/rankforge-section";
+
+export default function CompetitorAnalysisPage() {
+  return <RankForgeSection eyebrow="Market intelligence" title="Competitor Analysis" description="Understand where competing domains win visibility, which topics they own, and where RankForge can find the fastest route to share of voice." action="Add competitor" stats={[{ label: "Tracked competitors", value: "12", change: "+2 this month" }, { label: "Keyword overlap", value: "64%", change: "+6.8%" }, { label: "Content gaps", value: "2,130", change: "+184 found" }]} rows={[{ name: "Comparison content gap", value: "+12.8K visits", detail: "High intent terms missing from your site", status: "High impact" }, { name: "Competitor A gaining share", value: "8.4K keywords", detail: "Strongest movement in software topics", status: "Monitor" }, { name: "Backlink authority gap", value: "24 points", detail: "Editorial domains linking to competitor pages", status: "Research" }]} />;
+}
