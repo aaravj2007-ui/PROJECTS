@@ -83,8 +83,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   ]);
 
   useEffect(() => {
-    if (!isLoading && !user) router.replace("/login");
-    else if (!isLoading && user && !user.onboardingCompleted && pathname !== "/onboarding") router.replace("/onboarding");
+    if (!isLoading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    else if (!isLoading && user && !user.onboardingCompleted && pathname !== "/onboarding") router.replace(`/onboarding?next=${encodeURIComponent(pathname)}`);
   }, [isLoading, pathname, router, user]);
 
   if (isLoading || !user) return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-sm text-slate-400">Loading your RankForge workspace...</div>;
@@ -185,8 +185,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               { label: "Workspace", icon: "workspace" },
               { label: "Settings", icon: "settings" },
               { label: "Help & Support", icon: "help" },
-            ].map(({ label, icon: Icon }) => (
-              <button key={label} onClick={() => label === "Help & Support" ? setShowAssistant(true) : setToast(`${label} panel opened.`)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-400 transition hover:bg-slate-900 hover:text-white">
+            ].map(({ label, icon: Icon }) => label === "Settings" ? (
+              <Link key={label} href="/settings" className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-400 transition hover:bg-slate-900 hover:text-white">
+                <UiIcon name={Icon} />
+                <span>{label}</span>
+              </Link>
+            ) : (
+              <button key={label} onClick={() => setShowAssistant(true)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-slate-400 transition hover:bg-slate-900 hover:text-white">
                 <UiIcon name={Icon} />
                 <span>{label}</span>
               </button>
